@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invitación de Boda</title>
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Georgia', serif;
+    overflow: hidden;
+  }
+
+  /* Fondo cielo con nubes */
+  body {
+    background: linear-gradient(to top, #87ceeb, #e0f7ff);
+    position: relative;
+  }
+
+  .petalo {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50% 50% 50% 50%;
+    opacity: 0.8;
+    animation: caer 6s linear infinite;
+  }
+
+  @keyframes caer {
+    from { transform: translateY(-10vh) rotate(0deg); }
+    to { transform: translateY(110vh) rotate(360deg); }
+  }
+
+  /* Contenedor central */
+  .center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  /* Sobre */
+  .sobre {
+    width: 220px;
+    height: 140px;
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    margin: auto;
+    transition: transform 1s ease;
+  }
+
+  .sobre.abierto {
+    transform: rotateX(180deg);
+  }
+
+  .btn {
+    margin-top: 20px;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    background: #ff4d6d;
+    color: white;
+    box-shadow: 0 0 15px rgba(255, 77, 109, 0.7);
+    transition: background 0.3s;
+  }
+
+  .btn:hover {
+    background: #ff3355;
+  }
+
+  /* Flash */
+  .flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 2s ease;
+    z-index: 5;
+  }
+
+  .flash.mostrar {
+    opacity: 1;
+  }
+
+  /* Hoja */
+  .hoja {
+    display: none;
+    background: #fff8e7;
+    width: 90%;
+    max-width: 500px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.3);
+    margin: auto;
+    text-align: center;
+    font-size: 20px;
+    line-height: 1.5;
+  }
+
+  .navegacion {
+    margin-top: 20px;
+  }
+
+  .navegacion button {
+    margin: 0 10px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 20px;
+    background: #87ceeb;
+    color: white;
+    cursor: pointer;
+  }
+
+  /* Mapa simulado */
+  .mapa {
+    width: 100%;
+    height: 250px;
+    background: #ddd;
+    position: relative;
+    border-radius: 10px;
+    margin-top: 15px;
+  }
+
+  .punto {
+    width: 18px;
+    height: 18px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+    cursor: pointer;
+  }
+
+  .punto1 { top: 50px; left: 80px; }
+  .punto2 { top: 120px; left: 200px; }
+  .punto3 { top: 180px; left: 150px; }
+</style>
+</head>
+<body>
+
+<!-- Pétalos -->
+<div id="petalos"></div>
+
+<!-- Contenido central -->
+<div class="center" id="intro">
+  <div class="sobre" id="sobre"></div>
+  <button class="btn" id="abrirBtn">Abrir sobre</button>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<!-- Páginas de la invitación -->
+<div class="center">
+  <div class="hoja" id="hoja1">
+    <h2>💍 Te invitamos a nuestra boda 💍</h2>
+    <div class="navegacion">
+      <button onclick="mostrarPagina(2)">Siguiente ➡️</button>
+    </div>
+  </div>
+
+  <div class="hoja" id="hoja2">
+    <h2>⏰ Horarios</h2>
+    <p>Ceremonia: 4:00 PM</p>
+    <p>Boda: 5:00 PM</p>
+    <p>Fiesta: 7:00 PM</p>
+    <div class="navegacion">
+      <button onclick="mostrarPagina(1)">⬅️ Anterior</button>
+      <button onclick="mostrarPagina(3)">Siguiente ➡️</button>
+    </div>
+  </div>
+
+  <div class="hoja" id="hoja3">
+    <h2>📍 Ubicaciones</h2>
+    <div class="mapa">
+      <div class="punto punto1" onclick="window.open('https://www.google.com/maps','_blank')" title="Ceremonia"></div>
+      <div class="punto punto2" title="Boda"></div>
+      <div class="punto punto3" title="Fiesta"></div>
+    </div>
+    <div class="navegacion">
+      <button onclick="mostrarPagina(2)">⬅️ Anterior</button>
+      <button onclick="mostrarPagina(4)">Siguiente ➡️</button>
+    </div>
+  </div>
+
+  <div class="hoja" id="hoja4">
+    <h2>✨ Gracias por abrir ✨</h2>
+    <p>¡Te esperamos en nuestro gran día! 💖</p>
+    <div class="navegacion">
+      <button onclick="mostrarPagina(3)">⬅️ Anterior</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Pétalos dinámicos
+  const petalosCont = document.getElementById("petalos");
+  for (let i = 0; i < 20; i++) {
+    let petalo = document.createElement("div");
+    petalo.className = "petalo";
+    petalo.style.left = Math.random() * 100 + "vw";
+    petalo.style.animationDuration = 4 + Math.random() * 4 + "s";
+    petalo.style.opacity = Math.random();
+    petalosCont.appendChild(petalo);
+  }
+
+  const abrirBtn = document.getElementById("abrirBtn");
+  const sobre = document.getElementById("sobre");
+  const flash = document.getElementById("flash");
+
+  abrirBtn.addEventListener("click", () => {
+    sobre.classList.add("abierto");
+    setTimeout(() => {
+      flash.classList.add("mostrar");
+      setTimeout(() => {
+        flash.classList.remove("mostrar");
+        document.getElementById("intro").style.display = "none";
+        mostrarPagina(1);
+      }, 2000);
+    }, 1000);
+  });
+
+  function mostrarPagina(num) {
+    for (let i = 1; i <= 4; i++) {
+      document.getElementById("hoja" + i).style.display = "none";
+    }
+    document.getElementById("hoja" + num).style.display = "block";
+  }
+</script>
+
+</body>
+</html>
