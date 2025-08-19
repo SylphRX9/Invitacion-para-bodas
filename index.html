@@ -116,6 +116,24 @@
     .ubicaciones a:hover {
       background: #335cd1;
     }
+
+    /* Botón de música flotante */
+    #btnMusica {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: rgba(255,255,255,0.8);
+      border: none;
+      border-radius: 50%;
+      padding: 15px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: background 0.3s;
+    }
+    #btnMusica:hover {
+      background: rgba(255,255,255,1);
+    }
   </style>
 </head>
 <body>
@@ -188,7 +206,13 @@
     <source src="MusicadeFondo.mp3" type="audio/mpeg">
   </audio>
 
+  <!-- Botón de música flotante -->
+  <button id="btnMusica" onclick="toggleMusica()">🔊</button>
+
   <script>
+    const musica = document.getElementById('musica');
+    const btnMusica = document.getElementById('btnMusica');
+
     function abrirSobre() {
       const sobre = document.getElementById('sobre');
       sobre.classList.add('pulse');
@@ -201,6 +225,16 @@
     function mostrarPantalla(n) {
       document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
       document.getElementById('pantalla' + n).classList.add('activa');
+    }
+
+    function toggleMusica() {
+      if (musica.paused) {
+        musica.play();
+        btnMusica.textContent = "🔊";
+      } else {
+        musica.pause();
+        btnMusica.textContent = "🔇";
+      }
     }
   </script>
 </body>
