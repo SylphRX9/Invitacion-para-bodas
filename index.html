@@ -92,7 +92,7 @@
     background:#87ceeb; color:#fff; cursor:pointer;
   }
 
-  /* Lista de ubicaciones */
+  /* Lista de ubicaciones con diseño mejorado */
   .ubicaciones{
     display:flex;
     flex-direction:column;
@@ -100,16 +100,51 @@
     margin-top:18px;
   }
   .ubicaciones button{
+    display:flex;
+    align-items:center;
+    gap:12px;
     padding:12px 20px;
     border:none;
-    border-radius:20px;
+    border-radius:16px;
+    background: #f0f8ff;
+    color: #333;
+    font-weight:600;
+    cursor:pointer;
+    transition:.25s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  .ubicaciones button:hover{ background:#e0f0ff; transform: translateY(-2px); }
+
+  .ubicaciones button .numCircle{
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    background:var(--azul);
+    color:#fff;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+
+  /* Botón de mutear */
+  #muteBtn{
+    position:fixed;
+    top:20px;
+    right:20px;
+    padding:10px 16px;
+    border:none;
+    border-radius:24px;
     background:var(--azul);
     color:white;
     font-weight:600;
     cursor:pointer;
-    transition:.2s;
+    box-shadow:0 0 12px rgba(30,144,255,.5);
+    z-index:5;
+    transition:.25s;
   }
-  .ubicaciones button:hover{ background:#1c7ed6; transform: translateY(-2px);}
+  #muteBtn:hover{ background:#1c7ed6; transform:translateY(-1px);}
 </style>
 </head>
 <body>
@@ -142,6 +177,9 @@
 <!-- FLASH -->
 <div id="flash"></div>
 
+<!-- ====== BOTÓN DE MUTE ====== -->
+<button id="muteBtn">🔊</button>
+
 <!-- ====== HOJAS ====== -->
 <div class="center" id="paginas">
   <div class="hoja" id="hoja1">
@@ -165,9 +203,15 @@
   <div class="hoja" id="hoja3">
     <h2>📍 Ubicaciones</h2>
     <div class="ubicaciones">
-      <button onclick="window.open('https://www.google.com/maps','_blank')">Ceremonia</button>
-      <button onclick="alert('Ubicación de la Boda (pendiente de definir)')">Boda</button>
-      <button onclick="alert('Ubicación de la Fiesta (pendiente de definir)')">Fiesta</button>
+      <button onclick="window.open('https://www.google.com/maps','_blank')">
+        <div class="numCircle">1</div> Ceremonia
+      </button>
+      <button onclick="alert('Ubicación de la Boda (pendiente de definir)')">
+        <div class="numCircle">2</div> Boda
+      </button>
+      <button onclick="alert('Ubicación de la Fiesta (pendiente de definir)')">
+        <div class="numCircle">3</div> Fiesta
+      </button>
     </div>
     <div class="navegacion">
       <button class="navbtn" onclick="mostrarPagina(2)">⬅ Anterior</button>
@@ -210,17 +254,17 @@
   const flash = document.getElementById("flash");
   const intro = document.getElementById("intro");
   const bgMusic = document.getElementById("bgMusic");
+  const muteBtn = document.getElementById("muteBtn");
+
+  let muted = false;
 
   abrirBtn.addEventListener("click", () => {
-    // efecto shake emoji
     emojiSobre.classList.add("shake");
     setTimeout(()=> emojiSobre.classList.remove("shake"), 500);
 
-    // música
     bgMusic.currentTime = 0;
     bgMusic.play().catch(()=>{});
 
-    // flash + mostrar páginas
     setTimeout(()=>{
       flash.classList.add("mostrar");
       setTimeout(()=>{
@@ -229,6 +273,12 @@
         mostrarPagina(1);
       }, 1700);
     }, 900);
+  });
+
+  muteBtn.addEventListener("click", ()=>{
+    muted = !muted;
+    bgMusic.muted = muted;
+    muteBtn.textContent = muted ? "🔇" : "🔊";
   });
 
   function mostrarPagina(num){
