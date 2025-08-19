@@ -1,241 +1,243 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Invitación de Boda</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      background: skyblue;
-      overflow: hidden;
-      text-align: center;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Invitación de Boda</title>
 
-    /* Fondo con nubes estilo Toy Story */
-    .nube {
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-      opacity: 0.9;
-      animation: moverNubes 60s linear infinite;
-    }
-    .nube::before,
-    .nube::after {
-      content: '';
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-    }
-    .nube::before {
-      width: 100px; height: 100px;
-      top: -50px; left: -50px;
-    }
-    .nube::after {
-      width: 120px; height: 120px;
-      top: -40px; left: 40px;
-    }
-    @keyframes moverNubes {
-      from { transform: translateX(-200px); }
-      to { transform: translateX(100vw); }
-    }
+<style>
+  :root{
+    --rosa:#ff4d6d;
+    --cielo:#6ec6ff;
+    --papel:#fff8e7;
+    --azul:#1e90ff;
+    --marco:#dcdcdc;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Georgia", serif;
+    background: var(--cielo);
+    overflow:hidden;
+  }
 
-    /* Pantallas */
-    .pantalla {
-      display: none;
-      height: 100vh;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-    .activa { display: flex; }
+  /* ====== CIELO (Nubes) ====== */
+  #cielo{position:fixed; inset:0; z-index:0; pointer-events:none;}
+  .cloud{position:absolute;width:220px;height:140px;animation: moveCloud linear infinite; will-change: transform; filter: drop-shadow(0 3px 0 rgba(255,255,255,.6));}
+  .c1{ top:10vh; left:-25vw; animation-duration: 60s; transform: scale(1.1); }
+  .c2{ top:28vh; left:-35vw; animation-duration: 80s; transform: scale(.9); }
+  .c3{ top:52vh; left:-30vw; animation-duration: 70s; transform: scale(1.2); }
+  .c4{ top:72vh; left:-40vw; animation-duration: 95s; transform: scale(1.0); }
+  @keyframes moveCloud { from { transform: translateX(0) } to { transform: translateX(140vw) } }
 
-    /* Sobre emoji */
-    .sobre {
-      font-size: 100px;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-    .pulse {
-      animation: pulseAnim 0.6s;
-    }
-    @keyframes pulseAnim {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.3); }
-      100% { transform: scale(1); }
-    }
+  /* ====== PÉTALOS ====== */
+  #petalos{position:fixed; inset:0; pointer-events:none; z-index:1;}
+  .petalo{position:absolute;width:28px;height:28px;animation: caer var(--dur,7s) linear infinite, vaivén var(--vaiven,4s) ease-in-out infinite; transform-origin: 50% 0%; opacity: var(--op, .9); will-change: transform;}
+  @keyframes caer{ from{ transform: translateY(-15vh) rotate(0deg); } to{ transform: translateY(115vh) rotate(360deg); } }
+  @keyframes vaivén{ 0%{ margin-left: -10px; } 50%{ margin-left: 10px; } 100%{ margin-left: -10px; } }
 
-    /* Hoja */
-    .hoja {
-      background: beige;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      width: 80%;
-      max-width: 400px;
-    }
-    .botones {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-around;
-    }
-    button {
-      padding: 10px 20px;
-      border: none;
-      background: #ff4d6d;
-      color: white;
-      border-radius: 10px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #e63c5c;
-    }
+  /* ====== CONTENIDO CENTRAL ====== */
+  .center{position:fixed; top:50%; left:50%; transform: translate(-50%,-50%); text-align:center; z-index:2;}
 
-    /* Lista ubicaciones */
-    .ubicaciones {
-      list-style: none;
-      padding: 0;
-      text-align: left;
-    }
-    .ubicaciones li {
-      margin: 15px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .ubicaciones a {
-      padding: 8px 15px;
-      background: #4d79ff;
-      color: white;
-      border-radius: 8px;
-      text-decoration: none;
-    }
-    .ubicaciones a:hover {
-      background: #335cd1;
-    }
+  /* ====== EMOJI SOBRE ====== */
+  #emojiSobre{
+    font-size:100px;
+    display:block;
+    transition: transform .2s;
+  }
+  #emojiSobre.shake{
+    animation: shake 0.5s ease;
+  }
+  @keyframes shake{
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-10px) rotate(-10deg); }
+    50% { transform: translateX(10px) rotate(10deg); }
+    75% { transform: translateX(-10px) rotate(-10deg); }
+    100% { transform: translateX(0); }
+  }
 
-    /* Botón de música flotante */
-    #btnMusica {
-      position: fixed;
-      top: 15px;
-      right: 15px;
-      background: rgba(255,255,255,0.8);
-      border: none;
-      border-radius: 50%;
-      padding: 15px;
-      font-size: 20px;
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-      transition: background 0.3s;
-    }
-    #btnMusica:hover {
-      background: rgba(255,255,255,1);
-    }
-  </style>
+  /* Botón */
+  .btn{
+    margin-top:18px;
+    padding:12px 26px;
+    border:none; border-radius:28px;
+    font-size:16px; cursor:pointer;
+    background:var(--rosa); color:#fff;
+    box-shadow:0 0 18px rgba(255,77,109,.65);
+    transition:.25s;
+  }
+  .btn:hover{ transform: translateY(-1px); filter:brightness(1.05); }
+
+  /* FLASH */
+  #flash{position:fixed; inset:0; background:white; opacity:0; z-index:3; pointer-events:none; transition: opacity 1.8s ease;}
+  #flash.mostrar{ opacity:1; }
+
+  /* HOJAS */
+  .hoja{
+    display:none;
+    width:min(92vw,560px);
+    margin:auto;
+    background:var(--papel);
+    border-radius:16px;
+    padding:28px 22px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.22);
+    text-align:center;
+    z-index:2;
+  }
+  .hoja h2{ margin-top:0; font-weight:600 }
+  .navegacion{ margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .navbtn{
+    padding:10px 18px; border:none; border-radius:20px;
+    background:#87ceeb; color:#fff; cursor:pointer;
+  }
+
+  /* Lista de ubicaciones */
+  .ubicaciones{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:18px;
+  }
+  .ubicaciones button{
+    padding:12px 20px;
+    border:none;
+    border-radius:20px;
+    background:var(--azul);
+    color:white;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
+  }
+  .ubicaciones button:hover{ background:#1c7ed6; transform: translateY(-2px);}
+</style>
 </head>
 <body>
 
-  <!-- Nubes -->
-  <div class="nube" style="width:120px; height:120px; top:50px; left:-150px;"></div>
-  <div class="nube" style="width:150px; height:150px; top:150px; left:-300px;"></div>
-  <div class="nube" style="width:100px; height:100px; top:250px; left:-200px;"></div>
+<!-- ====== Nubes ====== -->
+<div id="cielo" aria-hidden="true">
+  <svg class="cloud c1" viewBox="0 0 220 140"><g fill="#fff">
+    <circle cx="60" cy="80" r="38"/><circle cx="100" cy="62" r="48"/><circle cx="145" cy="80" r="40"/>
+    <rect x="45" y="90" width="120" height="28" rx="14" ry="14"/></g></svg>
+  <svg class="cloud c2" viewBox="0 0 220 140"><g fill="#fff">
+    <circle cx="70" cy="78" r="34"/><circle cx="110" cy="60" r="46"/><circle cx="155" cy="78" r="36"/>
+    <rect x="55" y="88" width="120" height="26" rx="13" ry="13"/></g></svg>
+  <svg class="cloud c3" viewBox="0 0 220 140"><g fill="#fff">
+    <circle cx="60" cy="76" r="36"/><circle cx="100" cy="58" r="50"/><circle cx="150" cy="76" r="38"/>
+    <rect x="48" y="88" width="124" height="28" rx="14" ry="14"/></g></svg>
+  <svg class="cloud c4" viewBox="0 0 220 140"><g fill="#fff">
+    <circle cx="66" cy="78" r="34"/><circle cx="106" cy="60" r="44"/><circle cx="150" cy="78" r="36"/>
+    <rect x="54" y="90" width="118" height="26" rx="13" ry="13"/></g></svg>
+</div>
 
-  <!-- Pantalla 1: Sobre -->
-  <div class="pantalla activa" id="pantalla1">
-    <div class="sobre" id="sobre">✉️</div>
-    <button onclick="abrirSobre()">Abrir sobre</button>
-  </div>
+<!-- ====== Pétalos ====== -->
+<div id="petalos" aria-hidden="true"></div>
 
-  <!-- Pantalla 2: Invitación -->
-  <div class="pantalla" id="pantalla2">
-    <div class="hoja">
-      <h2>Te invitamos a nuestra boda 💍</h2>
-      <div class="botones">
-        <button onclick="mostrarPantalla(1)">Anterior</button>
-        <button onclick="mostrarPantalla(3)">Siguiente</button>
-      </div>
+<!-- ====== INTRO CON EMOJI ====== -->
+<div class="center" id="intro">
+  <span id="emojiSobre">✉️</span>
+  <button class="btn" id="abrirBtn">Abrir sobre</button>
+</div>
+
+<!-- FLASH -->
+<div id="flash"></div>
+
+<!-- ====== HOJAS ====== -->
+<div class="center" id="paginas">
+  <div class="hoja" id="hoja1">
+    <h2>💍 Te invitamos a nuestra boda 💍</h2>
+    <div class="navegacion">
+      <button class="navbtn" onclick="mostrarPagina(2)">Siguiente ➜</button>
     </div>
   </div>
 
-  <!-- Pantalla 3: Horario -->
-  <div class="pantalla" id="pantalla3">
-    <div class="hoja">
-      <h2>Horario de Eventos</h2>
-      <p>⏰ Ceremonia: 3:00 PM</p>
-      <p>⏰ Boda: 5:00 PM</p>
-      <p>⏰ Fiesta: 8:00 PM</p>
-      <div class="botones">
-        <button onclick="mostrarPantalla(2)">Anterior</button>
-        <button onclick="mostrarPantalla(4)">Siguiente</button>
-      </div>
+  <div class="hoja" id="hoja2">
+    <h2>⏰ Horarios</h2>
+    <p>Ceremonia: 4:00 PM</p>
+    <p>Boda: 5:00 PM</p>
+    <p>Fiesta: 7:00 PM</p>
+    <div class="navegacion">
+      <button class="navbtn" onclick="mostrarPagina(1)">⬅ Anterior</button>
+      <button class="navbtn" onclick="mostrarPagina(3)">Siguiente ➜</button>
     </div>
   </div>
 
-  <!-- Pantalla 4: Ubicaciones -->
-  <div class="pantalla" id="pantalla4">
-    <div class="hoja">
-      <h2>Ubicaciones 📍</h2>
-      <ul class="ubicaciones">
-        <li>Ceremonia <a href="https://www.google.com/maps" target="_blank">Ver</a></li>
-        <li>Boda <a href="https://www.google.com/maps" target="_blank">Ver</a></li>
-        <li>Fiesta <a href="https://www.google.com/maps" target="_blank">Ver</a></li>
-      </ul>
-      <div class="botones">
-        <button onclick="mostrarPantalla(3)">Anterior</button>
-        <button onclick="mostrarPantalla(5)">Siguiente</button>
-      </div>
+  <div class="hoja" id="hoja3">
+    <h2>📍 Ubicaciones</h2>
+    <div class="ubicaciones">
+      <button onclick="window.open('https://www.google.com/maps','_blank')">Ceremonia</button>
+      <button onclick="alert('Ubicación de la Boda (pendiente de definir)')">Boda</button>
+      <button onclick="alert('Ubicación de la Fiesta (pendiente de definir)')">Fiesta</button>
+    </div>
+    <div class="navegacion">
+      <button class="navbtn" onclick="mostrarPagina(2)">⬅ Anterior</button>
+      <button class="navbtn" onclick="mostrarPagina(4)">Siguiente ➜</button>
     </div>
   </div>
 
-  <!-- Pantalla 5: Despedida -->
-  <div class="pantalla" id="pantalla5">
-    <div class="hoja">
-      <h2>Gracias por abrir la invitación ❤️</h2>
-      <p>¡Te esperamos en nuestra boda!</p>
-      <div class="botones">
-        <button onclick="mostrarPantalla(4)">Anterior</button>
-      </div>
+  <div class="hoja" id="hoja4">
+    <h2>✨ ¡Gracias por abrir! ✨</h2>
+    <p>¡Te esperamos en nuestro gran día! 💖</p>
+    <div class="navegacion">
+      <button class="navbtn" onclick="mostrarPagina(3)">⬅ Anterior</button>
     </div>
   </div>
+</div>
 
-  <!-- Música de fondo -->
-  <audio id="musica" autoplay loop>
-    <source src="MusicadeFondo.mp3" type="audio/mpeg">
-  </audio>
+<!-- MÚSICA DE FONDO -->
+<audio id="bgMusic" src="MusicadeFondo.mp3" preload="auto" loop></audio>
 
-  <!-- Botón de música flotante -->
-  <button id="btnMusica" onclick="toggleMusica()">🔊</button>
+<script>
+  /* ====== PÉTALOS ====== */
+  const petalosCont = document.getElementById("petalos");
+  const PETAL_COUNT = 30;
+  for(let i=0;i<PETAL_COUNT;i++){
+    const wrap = document.createElement("div");
+    wrap.className = "petalo";
+    wrap.style.left = Math.random()*100 + "vw";
+    wrap.style.top  = (-5 - Math.random()*30) + "vh";
+    wrap.style.setProperty('--dur', (6 + Math.random()*6) + 's');
+    wrap.style.setProperty('--vaiven', (3 + Math.random()*4) + 's');
+    wrap.style.setProperty('--op', (0.6 + Math.random()*0.4));
+    wrap.style.animationDelay = (Math.random()*-8)+'s';
+    wrap.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28"><path d="M12 2 C10 5, 6 7, 6 11 C6 15, 9 19, 12 22 C15 19, 18 15, 18 11 C18 7, 14 5, 12 2 Z" fill="#e11d48"/><path d="M12 5 C10.8 7, 9 8.5, 9 11 C9 13.8, 10.8 16.2, 12 17.6" fill="none" stroke="#b91c1c" stroke-width="1" opacity=".4"/></svg>`;
+    petalosCont.appendChild(wrap);
+  }
 
-  <script>
-    const musica = document.getElementById('musica');
-    const btnMusica = document.getElementById('btnMusica');
+  /* ====== EMOJI SOBRE / FLASH / PÁGINAS / MÚSICA ====== */
+  const abrirBtn = document.getElementById("abrirBtn");
+  const emojiSobre = document.getElementById("emojiSobre");
+  const flash = document.getElementById("flash");
+  const intro = document.getElementById("intro");
+  const bgMusic = document.getElementById("bgMusic");
 
-    function abrirSobre() {
-      const sobre = document.getElementById('sobre');
-      sobre.classList.add('pulse');
-      setTimeout(() => {
-        sobre.classList.remove('pulse');
-        mostrarPantalla(2);
-      }, 600);
+  abrirBtn.addEventListener("click", () => {
+    // efecto shake emoji
+    emojiSobre.classList.add("shake");
+    setTimeout(()=> emojiSobre.classList.remove("shake"), 500);
+
+    // música
+    bgMusic.currentTime = 0;
+    bgMusic.play().catch(()=>{});
+
+    // flash + mostrar páginas
+    setTimeout(()=>{
+      flash.classList.add("mostrar");
+      setTimeout(()=>{
+        flash.classList.remove("mostrar");
+        intro.style.display = "none";
+        mostrarPagina(1);
+      }, 1700);
+    }, 900);
+  });
+
+  function mostrarPagina(num){
+    for(let i=1;i<=4;i++){
+      const h = document.getElementById("hoja"+i);
+      h.style.display = (i===num) ? "block" : "none";
     }
+  }
+</script>
 
-    function mostrarPantalla(n) {
-      document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
-      document.getElementById('pantalla' + n).classList.add('activa');
-    }
-
-    function toggleMusica() {
-      if (musica.paused) {
-        musica.play();
-        btnMusica.textContent = "🔊";
-      } else {
-        musica.pause();
-        btnMusica.textContent = "🔇";
-      }
-    }
-  </script>
 </body>
 </html>
