@@ -5,10 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Invitación de Boda</title>
 
-<!-- Leaflet (mapa real con OpenStreetMap) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <style>
   :root{
     --rosa:#ff4d6d;
@@ -23,7 +19,7 @@
     margin:0;
     font-family: "Georgia", serif;
     background: var(--cielo);
-    overflow:hidden; /* control del escenario */
+    overflow:hidden;
   }
 
   /* ====== CIELO (Nubes tipo Toy Story) ====== */
@@ -38,17 +34,14 @@
     width: 220px;
     height: 140px;
     animation: moveCloud linear infinite;
+    will-change: transform;
+    filter: drop-shadow(0 3px 0 rgba(255,255,255,.6));
   }
-  /* diferentes velocidades / alturas */
   .c1{ top:10vh; left:-25vw; animation-duration: 60s; transform: scale(1.1); }
   .c2{ top:28vh; left:-35vw; animation-duration: 80s; transform: scale(.9); }
   .c3{ top:52vh; left:-30vw; animation-duration: 70s; transform: scale(1.2); }
   .c4{ top:72vh; left:-40vw; animation-duration: 95s; transform: scale(1.0); }
-
-  @keyframes moveCloud {
-    from { transform: translateX(0) }
-    to   { transform: translateX(140vw) }
-  }
+  @keyframes moveCloud { from { transform: translateX(0) } to { transform: translateX(140vw) } }
 
   /* ====== PÉTALOS SVG ====== */
   #petalos{
@@ -63,16 +56,10 @@
     animation: caer var(--dur,7s) linear infinite, vaivén var(--vaiven,4s) ease-in-out infinite;
     transform-origin: 50% 0%;
     opacity: var(--op, .9);
+    will-change: transform;
   }
-  @keyframes caer{
-    from{ transform: translateY(-15vh) rotate(0deg); }
-    to{ transform: translateY(115vh) rotate(360deg); }
-  }
-  @keyframes vaivén{
-    0%{ margin-left: -10px; }
-    50%{ margin-left: 10px; }
-    100%{ margin-left: -10px; }
-  }
+  @keyframes caer{ from{ transform: translateY(-15vh) rotate(0deg); } to{ transform: translateY(115vh) rotate(360deg); } }
+  @keyframes vaivén{ 0%{ margin-left: -10px; } 50%{ margin-left: 10px; } 100%{ margin-left: -10px; } }
 
   /* ====== CONTENIDO CENTRAL ====== */
   .center{
@@ -83,7 +70,7 @@
     z-index:2;
   }
 
-  /* ====== SOBRE (más real con flaps y forro interno) ====== */
+  /* ====== SOBRE (con liner, flaps y fix de costuras) ====== */
   .sobreWrap{ perspective: 1200px; }
   .sobre{
     width: 280px; height: 185px;
@@ -92,19 +79,17 @@
     transform-style: preserve-3d;
     filter: drop-shadow(0 12px 26px rgba(0,0,0,.25));
   }
-
-  /* base rectangular */
   .cuerpo{
     position:absolute; inset:0;
     background:#ffffff;
     border:2px solid var(--marco);
     border-radius:12px;
     z-index:1;
-    overflow:hidden; /* para mostrar el forro */
+    overflow:hidden; /* oculta el liner */
   }
-  /* forro interno con patrón en diagonal */
+  /* forro interno: lo bajamos y añadimos “boca” para que NO se vea en el pliegue */
   .liner{
-    position:absolute; inset:8px 8px 28px 8px;
+    position:absolute; left:8px; right:8px; top:28px; bottom:28px;
     border-radius:10px;
     background:
       repeating-linear-gradient(135deg,
@@ -112,21 +97,30 @@
         #fff 10px 20px);
     opacity:.9;
   }
+  /* tira blanca arriba para tapar el forro en la línea del pliegue */
+  .boca{
+    position:absolute; left:0; right:0; top:0; height:28px;
+    background:#fff;
+    z-index:3;
+  }
 
-  /* flaps laterales (triángulos) */
+  /* flaps */
   .flap-left, .flap-right, .flap-bottom{
     position:absolute;
     background:#f7f7f7;
+    will-change: transform;
   }
   .flap-left{
     left:0; top:20px; bottom:20px; width:50%;
     clip-path: polygon(0 0, 100% 50%, 0 100%);
     border-left:2px solid var(--marco);
+    z-index:2;
   }
   .flap-right{
     right:0; top:20px; bottom:20px; width:50%;
     clip-path: polygon(100% 0, 0 50%, 100% 100%);
     border-right:2px solid var(--marco);
+    z-index:2;
   }
   .flap-bottom{
     left:12px; right:12px; bottom:0; height:46%;
@@ -134,20 +128,22 @@
     border-bottom:2px solid var(--marco);
     border-left:2px solid var(--marco);
     border-right:2px solid var(--marco);
+    z-index:2;
   }
 
-  /* tapa superior */
+  /* tapa superior con backface-visibility para evitar parpadeos/costuras */
   .tapa{
-    position:absolute; left:0; right:0; top:0; height:58%;
+    position:absolute; left:-1px; right:-1px; top:-1px; height:58%;
     background:linear-gradient(#fafafa,#f0f0f0);
     border:2px solid var(--marco); border-bottom:none;
     border-radius:12px 12px 0 0;
     transform-origin: top center;
-    transform: rotateX(0deg);
-    z-index:3;
+    transform: rotateX(0deg) translateZ(0.1px);
+    z-index:5;
     box-shadow: 0 4px 12px rgba(0,0,0,.08) inset;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
-  /* pliegue de la tapa (línea) */
   .tapa:after{
     content:"";
     position:absolute; left:10px; right:10px; bottom:6px; height:2px;
@@ -162,13 +158,11 @@
     width:60px; height:24px; background:var(--rosa);
     border-radius:24px;
     filter: drop-shadow(0 0 8px rgba(255,77,109,.6));
-    z-index:5;
+    z-index:6;
   }
 
   .sobre.abre .tapa{ animation: abrir 1s ease forwards; }
-  @keyframes abrir{
-    to{ transform: rotateX(-160deg); }
-  }
+  @keyframes abrir{ to{ transform: rotateX(-160deg) translateZ(0.1px); } }
 
   .btn{
     margin-top:18px;
@@ -207,14 +201,15 @@
     background:#87ceeb; color:#fff; cursor:pointer;
   }
 
-  /* ====== MAPA REAL (Leaflet) + LEYENDAS ====== */
+  /* ====== MAPA SVG + LEYENDAS ====== */
   .mapa{
-    width:100%; height:320px; background:#cfe9ff;
+    width:100%; height:320px; background:#e9f6ff;
     border-radius:12px; position:relative;
     overflow:hidden;
     box-shadow: inset 0 0 40px rgba(0,0,0,.08);
   }
-  #realMap{ position:absolute; inset:0; }
+  #mapSvg{ position:absolute; inset:0; width:100%; height:100%; }
+
   /* Tarjetas flotantes */
   .legend{
     position:absolute;
@@ -228,7 +223,7 @@
     cursor:pointer;
     user-select:none;
     transition: transform .15s ease, box-shadow .15s ease;
-    z-index: 500; /* sobre el mapa */
+    z-index: 5; /* sobre el mapa svg */
   }
   .legend:hover{ transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0,0,0,.18); }
   .badge{
@@ -238,19 +233,9 @@
     box-shadow: 0 0 12px rgba(30,144,255,.6);
   }
   .legendText{ font-weight:600; white-space:nowrap; }
-  /* posiciones */
   .l1{ top:12px; left:12px; }
   .l2{ top:12px; right:12px; }
   .l3{ bottom:12px; left:50%; transform:translateX(-50%); }
-
-  /* Marcadores tipo círculo azul con número (para Leaflet) */
-  .pin{
-    width:34px; height:34px; border-radius:50%;
-    background:var(--azul);
-    color:#fff; display:grid; place-items:center; font-weight:700;
-    box-shadow:0 0 12px rgba(30,144,255,.6);
-    border:2px solid #fff;
-  }
 
   /* ====== RESPONSIVE ====== */
   @media (max-width:520px){
@@ -263,41 +248,20 @@
 </head>
 <body>
 
-<!-- ====== Nubes estilo Toy Story (SVG con formas redondas) ====== -->
+<!-- ====== Nubes estilo Toy Story ====== -->
 <div id="cielo" aria-hidden="true">
-  <!-- cada nube es un SVG con “puffs” -->
-  <svg class="cloud c1" viewBox="0 0 220 140">
-    <g fill="#fff">
-      <circle cx="60" cy="80" r="38"/>
-      <circle cx="100" cy="62" r="48"/>
-      <circle cx="145" cy="80" r="40"/>
-      <rect x="45" y="90" width="120" height="28" rx="14" ry="14"/>
-    </g>
-  </svg>
-  <svg class="cloud c2" viewBox="0 0 220 140">
-    <g fill="#fff">
-      <circle cx="70" cy="78" r="34"/>
-      <circle cx="110" cy="60" r="46"/>
-      <circle cx="155" cy="78" r="36"/>
-      <rect x="55" y="88" width="120" height="26" rx="13" ry="13"/>
-    </g>
-  </svg>
-  <svg class="cloud c3" viewBox="0 0 220 140">
-    <g fill="#fff">
-      <circle cx="60" cy="76" r="36"/>
-      <circle cx="100" cy="58" r="50"/>
-      <circle cx="150" cy="76" r="38"/>
-      <rect x="48" y="88" width="124" height="28" rx="14" ry="14"/>
-    </g>
-  </svg>
-  <svg class="cloud c4" viewBox="0 0 220 140">
-    <g fill="#fff">
-      <circle cx="66" cy="78" r="34"/>
-      <circle cx="106" cy="60" r="44"/>
-      <circle cx="150" cy="78" r="36"/>
-      <rect x="54" y="90" width="118" height="26" rx="13" ry="13"/>
-    </g>
-  </svg>
+  <svg class="cloud c1" viewBox="0 0 220 140"><g fill="#fff">
+    <circle cx="60" cy="80" r="38"/><circle cx="100" cy="62" r="48"/><circle cx="145" cy="80" r="40"/>
+    <rect x="45" y="90" width="120" height="28" rx="14" ry="14"/></g></svg>
+  <svg class="cloud c2" viewBox="0 0 220 140"><g fill="#fff">
+    <circle cx="70" cy="78" r="34"/><circle cx="110" cy="60" r="46"/><circle cx="155" cy="78" r="36"/>
+    <rect x="55" y="88" width="120" height="26" rx="13" ry="13"/></g></svg>
+  <svg class="cloud c3" viewBox="0 0 220 140"><g fill="#fff">
+    <circle cx="60" cy="76" r="36"/><circle cx="100" cy="58" r="50"/><circle cx="150" cy="76" r="38"/>
+    <rect x="48" y="88" width="124" height="28" rx="14" ry="14"/></g></svg>
+  <svg class="cloud c4" viewBox="0 0 220 140"><g fill="#fff">
+    <circle cx="66" cy="78" r="34"/><circle cx="106" cy="60" r="44"/><circle cx="150" cy="78" r="36"/>
+    <rect x="54" y="90" width="118" height="26" rx="13" ry="13"/></g></svg>
 </div>
 
 <!-- ====== PÉTALOS ====== -->
@@ -309,6 +273,7 @@
     <div class="sobre" id="sobre">
       <div class="cuerpo">
         <div class="liner"></div>
+        <div class="boca"></div>
         <div class="flap-left"></div>
         <div class="flap-right"></div>
         <div class="flap-bottom"></div>
@@ -346,7 +311,54 @@
   <div class="hoja" id="hoja3">
     <h2>📍 Ubicaciones</h2>
     <div class="mapa">
-      <div id="realMap"></div>
+      <!-- MAPA SENCILLO EN SVG (fondo) -->
+      <svg id="mapSvg" viewBox="0 0 1000 650" preserveAspectRatio="none" aria-hidden="true">
+        <!-- agua -->
+        <rect x="0" y="0" width="1000" height="650" fill="#dff3ff"/>
+        <!-- tierra -->
+        <rect x="40" y="40" width="920" height="570" rx="26" ry="26" fill="#f6fbff" stroke="#cbe7ff" stroke-width="2"/>
+        <!-- “carreteras” principales -->
+        <g stroke="#b3d9ff" stroke-width="10" stroke-linecap="round" opacity=".8">
+          <path d="M80 520 Q 300 400, 520 520 T 920 520" fill="none"/>
+          <path d="M120 140 Q 280 240, 360 180 T 600 240 T 860 180" fill="none"/>
+          <path d="M220 580 Q 400 420, 780 140" fill="none"/>
+        </g>
+        <!-- calles finas -->
+        <g stroke="#d6ecff" stroke-width="4" stroke-linecap="round">
+          <path d="M100 300 L 900 300"/>
+          <path d="M200 100 L 200 560"/>
+          <path d="M600 100 L 600 560"/>
+          <path d="M820 120 L 820 560"/>
+        </g>
+        <!-- zonas/parques -->
+        <g fill="#eafaff">
+          <rect x="140" y="220" width="130" height="80" rx="10"/>
+          <rect x="700" y="360" width="160" height="90" rx="14"/>
+          <rect x="420" y="120" width="120" height="70" rx="12"/>
+        </g>
+
+        <!-- marcadores circulares (solo decorativos detrás de las tarjetas) -->
+        <g>
+          <circle cx="190" cy="120" r="18" fill="#1e90ff" opacity=".35"/>
+          <circle cx="810" cy="160" r="18" fill="#1e90ff" opacity=".35"/>
+          <circle cx="500" cy="500" r="18" fill="#1e90ff" opacity=".35"/>
+        </g>
+        <!-- anillos de pulso suaves -->
+        <g opacity=".25">
+          <circle cx="190" cy="120" r="30" fill="none" stroke="#1e90ff" stroke-width="6">
+            <animate attributeName="r" from="10" to="60" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" from=".35" to="0" dur="3s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="810" cy="160" r="30" fill="none" stroke="#1e90ff" stroke-width="6">
+            <animate attributeName="r" from="10" to="60" dur="3s" repeatCount="indefinite" begin=".5s"/>
+            <animate attributeName="opacity" from=".35" to="0" dur="3s" repeatCount="indefinite" begin=".5s"/>
+          </circle>
+          <circle cx="500" cy="500" r="30" fill="none" stroke="#1e90ff" stroke-width="6">
+            <animate attributeName="r" from="10" to="60" dur="3s" repeatCount="indefinite" begin="1s"/>
+            <animate attributeName="opacity" from=".35" to="0" dur="3s" repeatCount="indefinite" begin="1s"/>
+          </circle>
+        </g>
+      </svg>
 
       <!-- Tarjeta 1 -->
       <div class="legend l1" id="legend1" title="Abrir en Google Maps">
@@ -379,6 +391,9 @@
   </div>
 </div>
 
+<!-- MÚSICA DE FONDO -->
+<audio id="bgMusic" src="MusicadeFondo.mp3" preload="auto" loop></audio>
+
 <script>
   /* ====== PÉTALOS SVG DINÁMICOS ====== */
   const petalosCont = document.getElementById("petalos");
@@ -392,8 +407,6 @@
     wrap.style.setProperty('--vaiven', (3 + Math.random()*4) + 's');
     wrap.style.setProperty('--op', (0.6 + Math.random()*0.4));
     wrap.style.animationDelay = (Math.random()*-8)+'s';
-
-    // SVG del pétalo (forma de gota/rosa)
     wrap.innerHTML = `
       <svg viewBox="0 0 24 24" width="28" height="28">
         <path d="M12 2 C10 5, 6 7, 6 11 C6 15, 9 19, 12 22 C15 19, 18 15, 18 11 C18 7, 14 5, 12 2 Z"
@@ -405,24 +418,30 @@
     petalosCont.appendChild(wrap);
   }
 
-  /* ====== LÓGICA DE SOBRE/FLASH/PÁGINAS ====== */
+  /* ====== SOBRE/FLASH/PÁGINAS/MÚSICA ====== */
   const abrirBtn = document.getElementById("abrirBtn");
   const sobre = document.getElementById("sobre");
   const flash = document.getElementById("flash");
   const intro = document.getElementById("intro");
+  const bgMusic = document.getElementById("bgMusic");
 
   abrirBtn.addEventListener("click", () => {
+    // abrir tapa
     sobre.classList.add("abre");
+
+    // música: intentamos iniciar al hacer click (interacción del usuario)
+    bgMusic.currentTime = 0;
+    bgMusic.play().catch(()=>{/* si el navegador bloquea, no pasa nada */});
+
+    // flash + mostrar páginas
     setTimeout(()=>{
       flash.classList.add("mostrar");
       setTimeout(()=>{
         flash.classList.remove("mostrar");
         intro.style.display = "none";
         mostrarPagina(1);
-        // Inicializar mapa cuando se abre la invitación
-        initMap();
-      }, 1700); // tiempo del flash
-    }, 900); // tiempo de apertura
+      }, 1700);
+    }, 900);
   });
 
   function mostrarPagina(num){
@@ -430,68 +449,18 @@
       const h = document.getElementById("hoja"+i);
       h.style.display = (i===num) ? "block" : "none";
     }
-    if(num===3 && window._map){ setTimeout(()=>{ _map.invalidateSize(); }, 150); }
   }
 
-  /* ====== MAPA LEAFLET ====== */
-  let _map;
-  function initMap(){
-    if(_map) return; // evitar reinit
-
-    // Centro por defecto (CDMX); cambia si quieres coordenadas exactas
-    const centro = [19.4326, -99.1332];
-
-    _map = L.map('realMap', {
-      zoomControl: true,
-      attributionControl: true,
-    }).setView(centro, 12);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(_map);
-
-    // Icono circular azul con número (DivIcon)
-    const pinDiv = num => L.divIcon({
-      className: 'pin',
-      html: num,
-      iconSize: [34,34],
-      iconAnchor: [17,17]
-    });
-
-    // Ejemplos de coordenadas (ajusta a tu evento)
-    const puntos = {
-      ceremonia: { name:'Ceremonia', coords:[19.4326, -99.1332] },       // Zócalo aprox.
-      boda:      { name:'Boda',      coords:[19.427, -99.1677] },        // Colonia Roma aprox.
-      fiesta:    { name:'Fiesta',    coords:[19.404, -99.157] }          // Del Valle aprox.
-    };
-
-    const m1 = L.marker(puntos.ceremonia.coords, {icon: pinDiv('1')})
-      .addTo(_map).bindPopup('Ceremonia');
-    const m2 = L.marker(puntos.boda.coords, {icon: pinDiv('2')})
-      .addTo(_map).bindPopup('Boda');
-    const m3 = L.marker(puntos.fiesta.coords, {icon: pinDiv('3')})
-      .addTo(_map).bindPopup('Fiesta');
-
-    // Ajustar vista a todos
-    const group = L.featureGroup([m1,m2,m3]);
-    _map.fitBounds(group.getBounds().pad(0.25));
-
-    // Tarjetas (leyendas) click
-    document.getElementById('legend1').addEventListener('click', () => {
-      window.open('https://www.google.com/maps','_blank');
-      _map.setView(puntos.ceremonia.coords, 16);
-      m1.openPopup();
-    });
-    document.getElementById('legend2').addEventListener('click', () => {
-      _map.setView(puntos.boda.coords, 16);
-      m2.openPopup();
-    });
-    document.getElementById('legend3').addEventListener('click', () => {
-      _map.setView(puntos.fiesta.coords, 16);
-      m3.openPopup();
-    });
-  }
+  // Tarjetas (acciones)
+  document.getElementById('legend1').addEventListener('click', () => {
+    window.open('https://www.google.com/maps','_blank');
+  });
+  document.getElementById('legend2').addEventListener('click', () => {
+    alert('Ubicación de la Boda (pendiente de definir)');
+  });
+  document.getElementById('legend3').addEventListener('click', () => {
+    alert('Ubicación de la Fiesta (pendiente de definir)');
+  });
 </script>
 </body>
 </html>
